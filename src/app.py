@@ -26,8 +26,8 @@ future = future[columns_needed].copy()  # Seleccionar solo las columnas que el m
 forecast = m.predict(future)
 
 # Dividir en datos actuales y predicciones
-actual = forecast[forecast['ds'] < future['ds'].max() - pd.Timedelta(days=5)]
-prediction = forecast[forecast['ds'] >= future['ds'].max() - pd.Timedelta(days=5)]
+actual = forecast[forecast['ds'] < future['ds'].max() - pd.Timedelta(days=6)]
+prediction = forecast[forecast['ds'] >= future['ds'].max() - pd.Timedelta(days=6)]
 
 # Gráfico de predicción
 fig, ax = plt.subplots(figsize=(10, 6))
