@@ -16,3 +16,8 @@ xgboost
 statsmodels
 pytest
 neuralprophet
+streamlit
+pickle
+json
+csv
+requests
