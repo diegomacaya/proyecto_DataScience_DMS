@@ -2,14 +2,19 @@ import streamlit as st
 import pandas as pd
 import matplotlib.pyplot as plt
 import pickle
-
+from PIL import Image
 # Configuración de la aplicación Streamlit
-st.title("Predicción del Valor del VTI")
+st.title("ValueTrak : Predicción del Valor del VTI")
 st.write("Gráfico que muestra los valores actuales y la predicción para los próximos 6 días")
 
 # Cargar el modelo guardado con pickle
 with open("/Users/eleinybellomanzo/Documents/proyecto ds/proyecto_DataScience_DMS/models/NeuralProphet_default.pkl", "rb") as f:
     m = pickle.load(f)
+
+# Cargar y mostrar el icono
+icon_path = "/Users/eleinybellomanzo/Documents/proyecto ds/proyecto_DataScience_DMS/data/icono1.png"  # Ajusta la ruta si es necesario
+icon = Image.open(icon_path)
+st.image(icon, width=100)  # Ajusta el tamaño si lo deseas
 
 # Cargar los datos históricos para generar las predicciones
 df_indicadores_D = pd.read_csv('/Users/eleinybellomanzo/Documents/proyecto ds/proyecto_DataScience_DMS/data/processed/total_data.csv')  # Ajusta la ruta según sea necesario
@@ -25,23 +30,40 @@ future = future[columns_needed].copy()  # Seleccionar solo las columnas que el m
 # Realizar la predicción
 forecast = m.predict(future)
 
-# Dividir en datos actuales y predicciones
-actual = forecast[forecast['ds'] < future['ds'].max() - pd.Timedelta(days=6)]
-prediction = forecast[forecast['ds'] >= future['ds'].max() - pd.Timedelta(days=6)]
+# Asegúrate de que las fechas estén en el formato correcto
+df_indicadores_D['ds'] = pd.to_datetime(df_indicadores_D['ds'])
+forecast['ds'] = pd.to_datetime(forecast['ds'])
 
-# Gráfico de predicción
-fig, ax = plt.subplots(figsize=(10, 6))
-ax.plot(actual['ds'], actual['yhat1'], label='Actual', color='blue')
-ax.plot(prediction['ds'], prediction['yhat1'], label='Predicción (6 días)', color='orange', linestyle='--')
+# Divide el DataFrame en histórico y predicción para graficar
+test_df = df_indicadores_D[int(0.8 * len(df_indicadores_D)):]  # Ajuste temporal del DataFrame de prueba
+actual = forecast[forecast['ds'] < test_df['ds'].iloc[0]]
+prediction = forecast[forecast['ds'] >= test_df['ds'].iloc[0]]
+
+# Combina los datos históricos y predicciones en un solo DataFrame para una línea continua
+combined_df = pd.concat([actual, prediction])
+
+# Filtra los últimos 6 días de predicción
+last_6_days_prediction = prediction.tail(6)
+
+# Visualización en Streamlit
+fig, ax = plt.subplots(figsize=(12, 6))
+# Línea continua para el histórico y predicción completa
+ax.plot(combined_df['ds'], combined_df['yhat1'], color='blue', label='Predicción Continuada')
+ax.scatter(combined_df['ds'], combined_df['y'], color='black', marker='o', s=10, label='Datos Reales')
+# Línea diferenciada para los últimos 6 días de predicción
+ax.plot(last_6_days_prediction['ds'], last_6_days_prediction['yhat1'], color='red', label='Predicción a 6 días')
+
+# Títulos y etiquetas
+ax.set_title('Pronóstico Continuo del VTI con NeuralProphet')
 ax.set_xlabel('Fecha')
 ax.set_ylabel('Valor del VTI')
-ax.set_title('Predicción del VTI')
 ax.legend()
+ax.grid(True)
 
-# Mostrar el gráfico en Streamlit
+# Mostrar la gráfica en Streamlit
 st.pyplot(fig)
 
-# Mostrar la tabla con los valores de predicción
-st.write("Tabla de Valores de Predicción")
-st.write(forecast.tail(6))  # Muestra solo los últimos 6 días de predicción
+# Mostrar la tabla de los últimos 6 días de predicción
+st.write("### Últimos 6 Días de Predicción")
+st.write(last_6_days_prediction[['ds', 'yhat1']].rename(columns={'ds': 'Fecha', 'yhat1': 'Predicción'}))
 
