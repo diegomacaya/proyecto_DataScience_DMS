@@ -5,7 +5,7 @@ import pickle
 from PIL import Image
 
 # Cargar y mostrar el icono
-icon_path = "/Users/eleinybellomanzo/Documents/proyecto ds/proyecto_DataScience_DMS/data/iconoDS.png"  # Ajusta la ruta si es necesario
+icon_path = "../data/iconoDS.png"  # Ajusta la ruta si es necesario
 icon = Image.open(icon_path)
 
 # Dividir en dos columnas para colocar la imagen y el título
@@ -19,11 +19,11 @@ with col2:
 st.write("Gráfico que muestra los valores actuales y la predicción para los próximos 6 días")
 
 # Cargar el modelo guardado con pickle
-with open("/Users/eleinybellomanzo/Documents/proyecto ds/proyecto_DataScience_DMS/models/NeuralProphet_default.pkl", "rb") as f:
+with open("../models/NeuralProphet_default.pkl", "rb") as f:
     m = pickle.load(f)
 
 # Cargar los datos históricos para generar las predicciones
-df_indicadores_D = pd.read_csv('/Users/eleinybellomanzo/Documents/proyecto ds/proyecto_DataScience_DMS/data/processed/total_data.csv')  # Ajusta la ruta según sea necesario
+df_indicadores_D = pd.read_csv('../data/processed/total_data.csv')  # Ajusta la ruta según sea necesario
 df_indicadores_D = df_indicadores_D.rename(columns={'date': 'ds', 'VTI_value': 'y'})
 
 # Generar el DataFrame futuro con las columnas necesarias
