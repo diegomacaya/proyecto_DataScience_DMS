@@ -3,18 +3,24 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import pickle
 from PIL import Image
-# Configuración de la aplicación Streamlit
-st.title("ValueTrak : Predicción del Valor del VTI")
+
+# Cargar y mostrar el icono
+icon_path = "/Users/eleinybellomanzo/Documents/proyecto ds/proyecto_DataScience_DMS/data/iconoDS.png"  # Ajusta la ruta si es necesario
+icon = Image.open(icon_path)
+
+# Dividir en dos columnas para colocar la imagen y el título
+col1, col2 = st.columns([1, 5])
+with col1:
+    st.image(icon, width=100)  # Ajusta el tamaño si lo deseas
+with col2:
+    st.title("ValueTrak : Predicción del Valor del VTI")
+
+# Descripción
 st.write("Gráfico que muestra los valores actuales y la predicción para los próximos 6 días")
 
 # Cargar el modelo guardado con pickle
 with open("/Users/eleinybellomanzo/Documents/proyecto ds/proyecto_DataScience_DMS/models/NeuralProphet_default.pkl", "rb") as f:
     m = pickle.load(f)
-
-# Cargar y mostrar el icono
-icon_path = "/Users/eleinybellomanzo/Documents/proyecto ds/proyecto_DataScience_DMS/data/icono1.png"  # Ajusta la ruta si es necesario
-icon = Image.open(icon_path)
-st.image(icon, width=100)  # Ajusta el tamaño si lo deseas
 
 # Cargar los datos históricos para generar las predicciones
 df_indicadores_D = pd.read_csv('/Users/eleinybellomanzo/Documents/proyecto ds/proyecto_DataScience_DMS/data/processed/total_data.csv')  # Ajusta la ruta según sea necesario
@@ -66,4 +72,3 @@ st.pyplot(fig)
 # Mostrar la tabla de los últimos 6 días de predicción
 st.write("### Últimos 6 Días de Predicción")
 st.write(last_6_days_prediction[['ds', 'yhat1']].rename(columns={'ds': 'Fecha', 'yhat1': 'Predicción'}))
-
