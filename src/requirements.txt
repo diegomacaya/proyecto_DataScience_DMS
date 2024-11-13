@@ -17,6 +17,4 @@ statsmodels
 pytest
 neuralprophet
 streamlit
-json
-csv
 requests
